@@ -10,7 +10,8 @@
 using namespace std;
 
 int main(int argc, char** argv ) {
-    long long t1, t2, freq, nread;
+    long long t1, t2, freq;
+	DWORD nread = 1;
 	long long count = 0;
 	char str[4096];
 
@@ -21,16 +22,18 @@ int main(int argc, char** argv ) {
     //}
 	
 	cout << "Opening file a.txt\n"; // << argv[1] << "\n";
-	FILE* f =fopen("a.txt", "rb");
+	HANDLE f = CreateFile(L"a.txt", GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING, 0, 0 );
 	
 	
     QueryPerformanceFrequency((LARGE_INTEGER *)&freq);// запрашиваем число тиков в 1 сек
 
 
 	QueryPerformanceCounter((LARGE_INTEGER *)&t1);// смотрим время после окончания цикла
-	while(!feof(f)) {
-			nread = fread(str, 1, 4096, f);
-			for (int i =0; i<nread;i++) {
+	BOOL bResult = TRUE;
+	while(!(bResult && nread == 0)) {
+
+			bResult = ReadFile(f, str, 4096, &nread, 0);
+			for (DWORD i =0; i<nread;i++) {
 				if(str[i] == '\n')
 					count++;
 			}
